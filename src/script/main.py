@@ -1,23 +1,19 @@
-import argparse
 import csv
+import argparse
 from types import FunctionType
 from typing import Any
 from tabulate import tabulate
+from .functions import average
+from .parser import parser
 
-report_types = ["average-rating"]
+
+report_types: list[str] = ["average-rating"]
 
 
-parser: argparse.ArgumentParser = argparse.ArgumentParser()
-parser.add_argument("--files", "-f", type=str, required=True, nargs="+")
-parser.add_argument("--report", "-r", type=str, required=True)
 args: argparse.Namespace = parser.parse_args()
 
 
-def average(values: list[int | float]) -> float: 
-    return (sum(values) / len(values)).__round__(2)
-
-
-def group_by(entries: list[dict[Any, Any]], field_name: str, field_to_agregate: str, agregate_function: FunctionType):
+def group_by(entries: list[dict[Any, Any]], field_name: str, field_to_agregate: str, function: FunctionType):
     result = {}
     for entry in entries:
         
@@ -28,7 +24,7 @@ def group_by(entries: list[dict[Any, Any]], field_name: str, field_to_agregate: 
             result.update({entry[field_name]: [entry[field_to_agregate]]})
             
     for entry in result:
-        result.update({entry: agregate_function(tuple(map(float, result[entry])))})
+        result.update({entry: function(tuple(map(float, result[entry])))})
         
     return result
 
