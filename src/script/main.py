@@ -10,9 +10,6 @@ from .parser import parser
 report_types: list[str] = ["average-rating"]
 
 
-args: argparse.Namespace = parser.parse_args()
-
-
 def group_by(entries: list[dict[Any, Any]], field_name: str, field_to_agregate: str, function: FunctionType):
     result = {}
     for entry in entries:
@@ -25,7 +22,8 @@ def group_by(entries: list[dict[Any, Any]], field_name: str, field_to_agregate: 
             
     for entry in result:
         result.update({entry: function(tuple(map(float, result[entry])))})
-        
+
+    print(result)    
     return result
 
 
@@ -43,13 +41,19 @@ def process_files(directories: list[str]):
             dict_reader = csv.DictReader(file)
             for entry in dict_reader:
                 entries.append(entry)
-    
+                
     return entries
 
 
-def main(args: argparse.Namespace) -> None:
-    entries = process_files(args.files)
+def main() -> None:
+    args: argparse.Namespace = parser.parse_args()
+
+    if args.report not in report_types:
+        print("Unknown report name")
+        raise Exception
+    
     report_name = args.report.split("-")
+    entries = process_files(args.files)        
     report = group_by(entries, "brand", report_name[1], eval(report_name[0]))
     data = list([[key, report[key]] for key in report])
     data.sort(key=lambda x: x[1], reverse=True)
@@ -57,4 +61,4 @@ def main(args: argparse.Namespace) -> None:
     
     
 if __name__ == "__main__":
-    main(args)
+    main()
