@@ -1,5 +1,4 @@
 import pytest
-import sys
 import os
 from src.script.main import *
 

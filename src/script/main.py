@@ -3,8 +3,16 @@ import argparse
 from types import FunctionType
 from typing import Any
 from tabulate import tabulate
-from .functions import average
-from .parser import parser
+
+
+# Костыльное решение из за проблемы с импортами, т.к. в первом варианте не запускается pytest, во втором сам скрипт
+try:
+    from functions import average
+    from parser import parser
+    
+except ImportError:
+    from .functions import average
+    from .parser import parser
 
 
 report_types: list[str] = ["average-rating"]
